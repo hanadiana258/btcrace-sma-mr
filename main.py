@@ -26,13 +26,16 @@ def on_batch(state, batch):
     4. Buy: if no position and close <= sma * (10000 - DIP_BPS) // 10000.
     """
     close = state.close("CBBTC")
-    if close is None:
+    if close is None or state.warming_up:
         return []
     
+    if state.warming_up:
+        return []
+
     cbbtc_window.append(close)
     if len(cbbtc_window) > SMA_N:
         cbbtc_window.pop(0)
-    
+
     if len(cbbtc_window) < SMA_N:
         return []
     
@@ -53,7 +56,7 @@ def on_batch(state, batch):
     else:
         if close <= sma * (10000 - DIP_BPS) // 10000:
             room = state.weight_room("CBBTC")
-            notional = max(1_000_000, min(state.cash, room))
+            notional = min(state.cash, room)
             if notional >= 1_000_000:
                 return [{
                     "side": "buy",

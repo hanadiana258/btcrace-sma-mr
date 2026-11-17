@@ -64,6 +64,7 @@ def on_batch(state, batch):
                     "notional_quote_units": int(notional),
                     "max_slippage_bps": SLIPPAGE_BPS
                 }]
+
                 
     return []
 
